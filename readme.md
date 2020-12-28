@@ -88,17 +88,17 @@ By all means, set up Data Lifecycle Manager if you have no automation in place, 
 * To temporarily suspend an operation, delete its enabling tag. You may leave its schedule tag(s) in place.
 * Examples (for an EC2 or RDS instance):
 
-  |Set of Tags|Works?|Comment|
+  |Tags|Funciona?|Comentário|
   |--|--|--|
-  |`managed-start` <br/>`managed-start-periodic`=`u=1,H=09,M=05`|Yes|Enabled and scheduled|
-  |`managed-start`=`No` <br/>`managed-start-periodic`=`u=1,H=09,M=05`|Yes|Value of enabling tag is always ignored|
-  |`managed-start` <br/>`managed-start-once`=`2017-12-31T09:05`|Yes||
-  |`managed-start` <br/>`managed-start-periodic`=`u=1,H=09,M=05` <br/>`managed-start-once`=`2017-12-31T09:05`|Yes|Both repetitive and one-time schedule tags are allowed|
-  |`managed-start`|No|No schedule tag|
-  |`managed-start-once`=`2017-12-31T09:05`|No|No enabling tag (operation is suspended)|
-  |`managed-start` <br/>`managed-start-once`|No|Blank schedule|
-  |`managed-start` <br/>`managed-start-periodic`=`Monday`|No|Invalid schedule|
-  |`managed-start` <br/>`managed-stop-periodic`=`u=1,H=09,M=05`|No|Enabling tag and schedule tag cover different operations|
+  |`managed-start` <br/>`managed-start-periodic`=`u=1,H=09,M=05`|Sim|Habilitado e Agendado|
+  |`managed-start`=`No` <br/>`managed-start-periodic`=`u=1,H=09,M=05`|Sim|Valor da tag managed-start é sempre ignorado|
+  |`managed-start` <br/>`managed-start-once`=`2017-12-31T09:05`|Sim||
+  |`managed-start` <br/>`managed-start-periodic`=`u=1,H=09,M=05` <br/>`managed-start-once`=`2017-12-31T09:05`|Sim|Manter as tags -periodic e -once é permitido|
+  |`managed-start`|No|Não em tag de agendamento|
+  |`managed-start-once`=`2017-12-31T09:05`|Não|Não, sem tag de ativação a operação é pausada|
+  |`managed-start` <br/>`managed-start-once`|Não|Não agendamento em branco|
+  |`managed-start` <br/>`managed-start-periodic`=`Monday`|Não|Agendamento inválido|
+  |`managed-start` <br/>`managed-stop-periodic`=`u=1,H=09,M=05`|Não|Tag de ativação corresponde a outra tag de operação|
 
 ## Scheduling Operations
  
@@ -116,15 +116,15 @@ By all means, set up Data Lifecycle Manager if you have no automation in place, 
 
   * Values: one or more of the following components:
 
-    |Name|Minimum|Maximum|Wildcard|Combines With|
+    |Nome|Minimo|Maximo|Wildcard|Combinações|
     |--|--|--|--|--|
-    |Day of month (`d`)|`d=01`|`d=31`|`d=*`|`H` and `M`, or `H:M`|
-    |Weekday (`u`)|`u=1` (Monday)|`u=7` (Sunday)||`H` and `M`, or `H:M`|
-    |Hour (`H`)|`H=00`|`H=23`|`H=*`|`d` or `u`, and `M`|
-    |Minute (`M`)|`M=00`|`M=59`||`d` or `u`, and `H`|
-    |Hour and minute (`H:M`)|`H:M=00:00`|`H:M=23:59`||`d` or `u`|
-    |Day of month, hour and minute (`dTH:M`)|`dTH:M=01T00:00`|`dTH:M=31T23:59`|||
-    |Weekday, hour and minute (`uTH:M`)|`uTH:M=1T00:00`|`uTH:M=7T23:59`|||
+    |Dia do mês (`d`)|`d=01`|`d=31`|`d=*`|`H` e `M`, ou `H:M`|
+    |Dia da semana (`u`)|`u=1` (Segunda)|`u=7` (Domingo)||`H` e `M`, ou `H:M`|
+    |Hora (`H`)|`H=00`|`H=23`|`H=*`|`d` ou `u`, e `M`|
+    |Minuto (`M`)|`M=00`|`M=59`||`d` ou `u`, e `H`|
+    |Hora e minuto (`H:M`)|`H:M=00:00`|`H:M=23:59`||`d` ou `u`|
+    |Dia do mês, hora e minuto (`dTH:M`)|`dTH:M=01T00:00`|`dTH:M=31T23:59`|||
+    |Dia da semana, hora e minuto (`uTH:M`)|`uTH:M=1T00:00`|`uTH:M=7T23:59`|||
     
       * To be valid, a component or combination of components must specify a day, hour and minute.
       * Repeat a whole component to specify multiple values. For example, `d=01,d=11,d=21` means the 1st, 11th and 21st days of the month.
@@ -134,13 +134,13 @@ By all means, set up Data Lifecycle Manager if you have no automation in place, 
 
   * Examples:
   
-    |Value of `-periodic` Schedule Tag|Demonstrates|Operation Begins|
+    |Valores de agendamento `-periodic` |Demonstração|Operação começa|
     |--|--|--|
-    |`d=28,H=14,M=25` _or_ `dTH:M=28T14:25`|Monthly event|Between 14:20 and 14:30 on the 28th day of every month.|
-    |`d=1,d=8,d=15,d=22,H=03,H=19,M=01`|`cron`-style schedule|Between 03:00 and 03:10 and again between 19:00 and 19:10, on the 1st, 8th, 15th, and 22nd days of every month.|
-    |`d=*,H=*,M=15,M=45,H:M=08:50`|Extra event in the day|Between 10 and 20 minutes after the hour and 40 to 50 minutes after the hour, every hour of every day, _and also_ every day between 08:50 and 09:00.|
-    |`d=*,H=11,M=00,uTH:M=2T03:30,uTH:M=5T07:20`|Extra weekly events|Between 11:00 and 11:10 every day, _and also_ every Tuesday between 03:30 and 03:40 and every Friday between 07:20 and 7:30.|
-    |`u=3,H=22,M=15,dTH:M=01T05:20`|Extra monthly event|Between 22:10 and 22:20 every Wednesday, _and also_ on the first day of every month between 05:20 and 05:30.|
+    |`d=28,H=14,M=25` ou `dTH:M=28T14:25`|Mensalmente|Entre as 14:20 e 14:30 no 28° dia todo mês.|
+    |`d=1,d=8,d=15,d=22,H=03,H=19,M=01`|Agendamento semelhante ao`cron`|Entre as 03:00 e 03:10 e novamente entre as 19:00 e 19:10, no 1°, 8°, 15º e 22° dias todos os meses.|
+    |`d=*,H=*,M=15,M=45,H:M=08:50`|Evento extra no dia|Entre 10 e 20 minutes depois da hora e 40 a 50 minutos depois da hora, a cada hora do dia, e também todos os dias as 08:50 e 09:00.|
+    |`d=*,H=11,M=00,uTH:M=2T03:30,uTH:M=5T07:20`|Evento extra na semana|Entre 11:00 and 11:10 todos os dias, e também todas as Terças entre as 03:30 and 03:40 e toda Sexta entre 07:20 e 7:30.|
+    |`u=3,H=22,M=15,dTH:M=01T05:20`|Evento extra no mês|Entre 22:10 e 22:20 toda Quinta, e também no primeiro dia do mês entre 05:20 e 05:30.|
     
     Remember to use spaces (` `) instead of commas (`,`) in RDS! (Either separator character is fine in EC2.)
     
@@ -252,11 +252,11 @@ Multiple _non-simultaneous_ operations on the same resource are allowed.
 
 If two or more operations on the same resource are scheduled for the same 10-minute interval, the function combines them, where possible:
 
-|Resource|Simultaneous Operations|Effect|
+|Recurso|Operação|Efeito|
 |--|--|--|
-|EC2 instance|Create Image + Reboot|Reboot then Create Image|
-|EC2 or RDS instance|Stop + Reboot|Stop|
-|RDS instance|Stop + Create Snapshot|Create Snapshot then Stop|
+|EC2 |Criar Imagem + Reboot|Reinicia e então Cria a Imagem|
+|EC2 ou RDS|Stop + Reboot|Para a máquina|
+|RDS|Stop + Create Snapshot|Cria o snapshot e depois Para|
 
 The Create Image + Reboot combination for EC2 instances is useful. For example, you could take hourly backups but reboot only in conjunction with the midnight backup. The midnight backup would be guaranteed to be coherent for all files, but you could safely retrieve static files as of any given hour, from the other backups. To set up this example:
 
@@ -273,11 +273,11 @@ The Create Image + Reboot combination for EC2 instances is useful. For example, 
 
 Resources tagged for unsupported combinations of operations are logged (with message `OPS_UNSUPPORTED`) and skipped.
 
-|Bad Combination|Reason|Example|
+|Combinação|Razão|Exemplo|
 |--|--|--|
-|Mutually exclusive operations|The operations conflict.|Start + Stop|
-|Choice of operation depends on current state of instance|The state of the instance could change between the status query and the operation request.|Start + Reboot|
-|Sequential or dependent operations|The logical order cannot always be inferred. Also, operations proceed asynchronously; one might not complete in time for another to begin. Note that Reboot then Create Image (EC2 instance) and Create Snapshot then Stop (RDS instance) are _single_ AWS operations.|Start + Create Image|
+| Operações mutuamente exclusivas | Conflito de operações. | Start + Stop |
+| A escolha da operação depende do estado atual da instância | O estado da instância pode mudar entre a consulta de status e o pedido de operação. | Iniciar + Reinicializar |
+| Operações sequenciais ou dependentes | A ordem lógica nem sempre pode ser inferida. Além disso, as operações prosseguem de forma assíncrona; um pode não ser concluído a tempo de outro começar. Observe que Reinicializar e criar imagem (instância EC2) e Criar instantâneo e parar (instância RDS) são operações _únicas_ da AWS. | Iniciar + Criar imagem |
 
 ## Security Model
 
